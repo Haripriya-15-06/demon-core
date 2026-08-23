@@ -1,9 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:battery_plus/battery_plus.dart';
-import 'package:vibration/vibration.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,42 +39,13 @@ class _DemonCoreMainScreenState extends State<DemonCoreMainScreen> {
   bool _isAwakening = false;
   double _holdProgress = 0.0;
   Timer? _holdTimer;
-  
-  final Battery _battery = Battery();
-  int _batteryLevel = 100;
-  BatteryState _batteryState = BatteryState.full;
-  StreamSubscription<BatteryState>? _batterySubscription;
-
-  @override
-  void initState() {
-    super.initState();
-    _initBattery();
-  }
-
-  void _initBattery() async {
-    try {
-      final level = await _battery.batteryLevel;
-      if (mounted) setState(() => _batteryLevel = level);
-      _batterySubscription = _battery.onBatteryStateChanged.listen((state) {
-        if (mounted) setState(() => _batteryState = state);
-      });
-    } catch (_) {}
-  }
-
-  @override
-  void dispose() {
-    _holdTimer?.cancel();
-    _batterySubscription?.cancel();
-    super.dispose();
-  }
 
   void _startAwakening() {
+    HapticFeedback.lightImpact();
     setState(() {
       _isAwakening = true;
       _holdProgress = 0.0;
     });
-
-    Vibration.vibrate(duration: 1000, amplitude: 64);
 
     _holdTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       setState(() {
@@ -85,7 +53,7 @@ class _DemonCoreMainScreenState extends State<DemonCoreMainScreen> {
       });
 
       if (_holdProgress >= 0.5 && _holdProgress < 0.52) {
-        Vibration.vibrate(pattern: [0, 200, 100, 200], intensities: [0, 128, 0, 255]);
+        HapticFeedback.mediumImpact();
       }
 
       if (_holdProgress >= 1.0) {
@@ -98,7 +66,6 @@ class _DemonCoreMainScreenState extends State<DemonCoreMainScreen> {
   void _cancelAwakening() {
     if (_isAwakened) return;
     _holdTimer?.cancel();
-    Vibration.cancel();
     setState(() {
       _isAwakening = false;
       _holdProgress = 0.0;
@@ -106,7 +73,7 @@ class _DemonCoreMainScreenState extends State<DemonCoreMainScreen> {
   }
 
   void _completeAwakening() {
-    Vibration.vibrate(duration: 500, amplitude: 255);
+    HapticFeedback.heavyImpact();
     setState(() {
       _isAwakening = false;
       _isAwakened = true;
@@ -162,9 +129,10 @@ class _DemonCoreMainScreenState extends State<DemonCoreMainScreen> {
                     strokeWidth: 4,
                   ),
                 ),
-              Container(
-                width: 120,
-                height: 120,
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                width: _isAwakening ? 140 : 120,
+                height: _isAwakening ? 140 : 120,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: const Color(0xFFFF0033),
@@ -176,9 +144,7 @@ class _DemonCoreMainScreenState extends State<DemonCoreMainScreen> {
                     )
                   ],
                 ),
-              )
-              .animate(onPlay: (controller) => controller.repeat(reverse: true))
-              .scaleXY(begin: 0.9, end: 1.1, duration: 1200.ms, curve: Curves.easeInOut),
+              ),
             ],
           ),
         ),
@@ -201,7 +167,7 @@ class _DemonCoreMainScreenState extends State<DemonCoreMainScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _statusItem("❤️ Core Power", "$_batteryLevel%"),
+        _statusItem("❤️ Core Power", "100%"),
         _statusItem("🩸 Blood Energy", "87%"),
         _statusItem("👑 Sovereign Status", "Dormant"),
         _statusItem("🌑 Demon Aura", "OFF"),
@@ -230,9 +196,9 @@ class _DemonCoreMainScreenState extends State<DemonCoreMainScreen> {
           "DEMON SOVEREIGN",
           style: TextStyle(color: Color(0xFFFF0033), fontSize: 24, fontWeight: FontWeight.black, letterSpacing: 6),
         ),
-        Text(
-          _batteryState == BatteryState.charging ? "CORE RECHARGING..." : "SYSTEM STABLE",
-          style: const TextStyle(color: Colors.white38, fontSize: 12, letterSpacing: 2),
+        const Text(
+          "SYSTEM STABLE",
+          style: TextStyle(color: Colors.white38, fontSize: 12, letterSpacing: 2),
         ),
         const Spacer(),
         Container(
@@ -278,7 +244,7 @@ class _DemonCoreMainScreenState extends State<DemonCoreMainScreen> {
   }
 
   void _triggerArt(String message) {
-    Vibration.vibrate(duration: 100);
+    HapticFeedback.lightImpact();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message, style: const TextStyle(color: Colors.white)),
