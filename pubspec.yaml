@@ -1,5 +1,5 @@
 name: demon_core
-description: "Demon Core Mobile App"
+description: "Demon Core App"
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -10,7 +10,6 @@ dependencies:
   flutter:
     sdk: flutter
   battery_plus: ^6.0.0
-  vibration: ^2.0.0
   flutter_animate: ^4.5.0
 
 dev_dependencies:
