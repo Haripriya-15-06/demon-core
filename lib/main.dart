@@ -55,11 +55,13 @@ class _DemonCoreMainScreenState extends State<DemonCoreMainScreen> {
   }
 
   void _initBattery() async {
-    final level = await _battery.batteryLevel;
-    setState(() => _batteryLevel = level);
-    _batterySubscription = _battery.onBatteryStateChanged.listen((state) {
-      setState(() => _batteryState = state);
-    });
+    try {
+      final level = await _battery.batteryLevel;
+      if (mounted) setState(() => _batteryLevel = level);
+      _batterySubscription = _battery.onBatteryStateChanged.listen((state) {
+        if (mounted) setState(() => _batteryState = state);
+      });
+    } catch (_) {}
   }
 
   @override
