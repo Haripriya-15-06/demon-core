@@ -1,3 +1,4 @@
+cat << 'EOF' > .github/workflows/build_apk.yml
 name: Build Demon Core APK
 
 on:
@@ -35,3 +36,4 @@ jobs:
         with:
           name: DemonCore-APK
           path: build/app/outputs/flutter-apk/app-release.apk
+EOF
