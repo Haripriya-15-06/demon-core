@@ -1,4 +1,3 @@
-cat << 'EOF' > .github/workflows/build_apk.yml
 name: Build Demon Core APK
 
 on:
@@ -23,17 +22,19 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.22.x'
           channel: 'stable'
 
-      - name: Get Dependencies
-        run: flutter pub get
+      - name: Disable Analytics & Get Packages
+        run: |
+          flutter config --no-analytics
+          flutter pub get
 
-      - name: Build APK
-        run: flutter build apk --release
+      - name: Build APK (Fat Release)
+        run: flutter build apk --release --no-tree-shake-icons
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: DemonCore-APK
           path: build/app/outputs/flutter-apk/app-release.apk
-EOF
