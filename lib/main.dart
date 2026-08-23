@@ -194,7 +194,7 @@ class _DemonCoreMainScreenState extends State<DemonCoreMainScreen> {
         const SizedBox(height: 20),
         const Text(
           "DEMON SOVEREIGN",
-          style: TextStyle(color: Color(0xFFFF0033), fontSize: 24, fontWeight: FontWeight.black, letterSpacing: 6),
+          style: TextStyle(color: Color(0xFFFF0033), fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 6),
         ),
         const Text(
           "SYSTEM STABLE",
